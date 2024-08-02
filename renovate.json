@@ -1,7 +1,13 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "local>corazawaf/renovate-config"
+    "local>corazawaf/renovate-config",
+    ":semanticPrefixFixDepsChoreOthers",
+    ":ignoreModulesAndTests",
+    "group:monorepos",
+    "group:best-practices",
+    "replacements:all",
+    "workarounds:all"
   ],
   "constraints": {
     "go": "1.21"
