@@ -1,0 +1,12 @@
+{
+  "osvVulnerabilityAlerts": true,
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "assignees": [
+      "@life360/infosec"
+    ],
+    "labels": [
+      "security"
+    ]
+  }
+}
