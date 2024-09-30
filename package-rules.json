@@ -8,6 +8,15 @@
       "automerge": true
     },
     {
+      "groupName": "go modules",
+      "matchManagers": [
+         "gomod"
+      ],
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automerge": true,
+      "postUpdateOptions": ["gomodUpdateImportPaths", "goModTidy"]
+    },
+    {
       "groupName": "all non-major dependencies",
       "groupSlug": "all-minor-patch",
       "matchSourceUrlPrefixes": [
