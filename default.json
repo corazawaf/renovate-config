@@ -3,11 +3,19 @@
   "extends": [
     "config:best-practices",
     ":separateMultipleMajorReleases",
+    ":semanticPrefixFixDepsChoreOthers",
+    ":ignoreModulesAndTests",
+    "group:monorepos",
+    "replacements:all",
+    "workarounds:all",
     "schedule:daily",
     "github>corazawaf/renovate-config:labels",
     "github>corazawaf/renovate-config:security",
     "github>corazawaf/renovate-config:package-rules"
   ],
   "commitMessageSuffix": " in {{packageFile}}",
-  "dependencyDashboardAutoclose": true
+  "dependencyDashboardAutoclose": true,
+  "constraints": {
+    "go": "1.21"
+  }
 }
