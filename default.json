@@ -14,8 +14,5 @@
     "github>corazawaf/renovate-config:package-rules"
   ],
   "commitMessageSuffix": " in {{packageFile}}",
-  "dependencyDashboardAutoclose": true,
-  "constraints": {
-    "go": "1.22"
-  }
+  "dependencyDashboardAutoclose": true
 }
