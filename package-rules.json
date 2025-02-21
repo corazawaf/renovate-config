@@ -11,7 +11,7 @@
       "groupName": "golang major release",
       "matchDatasources": ["docker", "golang-version"],
       "matchPackageNames": ["go", "golang"],
-      "allowedVersions": "<1.23.0"
+      "allowedVersions": "<1.24.0"
     },
     {
       "groupName": "go modules",
