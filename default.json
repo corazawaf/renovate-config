@@ -9,6 +9,8 @@
     "replacements:all",
     "workarounds:all",
     "schedule:daily",
+    "customManagers:dockerfileVersions",
+    "customManagers:githubActionsVersions",
     "github>corazawaf/renovate-config:labels",
     "github>corazawaf/renovate-config:security",
     "github>corazawaf/renovate-config:package-rules"
