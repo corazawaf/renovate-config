@@ -8,10 +8,16 @@
       "automerge": true
     },
     {
-      "groupName": "golang major release",
+      "groupName": "docker golang major release",
       "matchDatasources": ["docker", "golang-version"],
       "matchPackageNames": ["go", "golang"],
-      "allowedVersions": "<1.24.0"
+      "allowedVersions": "~1.25.0"
+    },
+    {
+      "groupName": "golang major release",
+      "matchManagers": ["gomod"],
+      "matchDepNames": ["go"],
+      "allowedVersions": "~1.25.0"
     },
     {
       "groupName": "go modules",
