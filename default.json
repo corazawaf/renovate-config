@@ -16,5 +16,8 @@
     "github>corazawaf/renovate-config:package-rules"
   ],
   "commitMessageSuffix": " in {{packageFile}}",
-  "dependencyDashboardAutoclose": true
+  "dependencyDashboardAutoclose": true,
+  "minimumReleaseAge": "15 days",
+  "prCreation": "not-pending",
+  "internalChecksFilter": "strict"
 }

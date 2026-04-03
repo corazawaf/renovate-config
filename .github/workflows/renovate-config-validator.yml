@@ -1,0 +1,46 @@
+name: renovate-config-validator
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  config-files:
+    runs-on: ubuntu-latest
+    outputs:
+      files: ${{ steps.file_list.outputs.files }}
+
+    steps:
+      - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4
+
+      - name: Find Renovate config files
+        id: file_list
+        run: |
+          set -x
+          files=$(find . -type f -name "*.json" \
+            \( -name "default.json" -o -name "package-rules.json" -o -name "labels.json" -o -name "security.json" \) \
+            | sed 's|^\./||')
+          if [ -z "$files" ]; then
+            files_json='[]'
+          else
+            files_json=$(echo "$files" | jq -R -s -c 'split("\n")[:-1]')
+          fi
+          echo "files=$files_json" >> $GITHUB_OUTPUT
+
+  validate:
+    needs: config-files
+    if: ${{ needs.config-files.outputs.files != '[]' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        file: ${{ fromJson(needs.config-files.outputs.files) }}
+    steps:
+      - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4
+      - uses: suzuki-shunsuke/github-action-renovate-config-validator@36a15b83e37bf3221dc9c02ff5ffdaefb51ca1cf # v1.1.0
+        with:
+          config_file_path: ${{ matrix.file }}
