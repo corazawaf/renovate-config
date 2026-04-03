@@ -1,6 +1,11 @@
 {
   "packageRules": [
     {
+      "minimumReleaseAge": "15 days",
+      "prCreation": "not-pending",
+      "internalChecksFilter": "strict"
+    },
+    {
       "groupName": "github-actions",
       "matchManagers": [
         "github-actions"
@@ -9,24 +14,42 @@
     },
     {
       "groupName": "docker golang major release",
-      "matchDatasources": ["docker", "golang-version"],
-      "matchPackageNames": ["go", "golang"],
+      "matchDatasources": [
+        "docker",
+        "golang-version"
+      ],
+      "matchPackageNames": [
+        "go",
+        "golang"
+      ],
       "allowedVersions": "~1.25.0"
     },
     {
       "groupName": "golang major release",
-      "matchManagers": ["gomod"],
-      "matchDepNames": ["go"],
+      "matchManagers": [
+        "gomod"
+      ],
+      "matchDepNames": [
+        "go"
+      ],
       "allowedVersions": "~1.25.0"
     },
     {
       "groupName": "go modules",
       "matchManagers": [
-         "gomod"
+        "gomod"
       ],
-      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin",
+        "digest"
+      ],
       "automerge": true,
-      "postUpdateOptions": ["gomodUpdateImportPaths", "goModTidy"]
+      "postUpdateOptions": [
+        "gomodUpdateImportPaths",
+        "goModTidy"
+      ]
     },
     {
       "groupName": "all non-major dependencies",
