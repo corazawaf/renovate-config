@@ -17,18 +17,26 @@ jobs:
     steps:
       - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4
 
-      - name: Find JSON files
+      - name: Find Renovate config files
         id: file_list
         run: |
           set -x
-          files=$(find . -type f -name "*.json" | sed 's|^\./||')
-          files_json=$(echo "$files" | jq -R -s -c 'split("\n")[:-1]')
+          files=$(find . -type f -name "*.json" \
+            \( -name "default.json" -o -name "package-rules.json" -o -name "labels.json" -o -name "security.json" \) \
+            | sed 's|^\./||')
+          if [ -z "$files" ]; then
+            files_json='[]'
+          else
+            files_json=$(echo "$files" | jq -R -s -c 'split("\n")[:-1]')
+          fi
           echo "files=$files_json" >> $GITHUB_OUTPUT
 
   validate:
     needs: config-files
+    if: ${{ needs.config-files.outputs.files != '[]' }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         file: ${{ fromJson(needs.config-files.outputs.files) }}
     steps:
