@@ -14,6 +14,9 @@ const __dirname = dirname(__filename);
 const configPath = join(__dirname, '..', 'package-rules.json');
 const packageRules: any[] = JSON.parse(readFileSync(configPath, 'utf8')).packageRules;
 
+const defaultConfigPath = join(__dirname, '..', 'default.json');
+const defaultConfig: any = JSON.parse(readFileSync(defaultConfigPath, 'utf8'));
+
 // ---------------------------------------------------------------------------
 // Helper: apply our packageRules to a simulated dependency update
 // ---------------------------------------------------------------------------
@@ -39,24 +42,19 @@ function applyRules(dep: {
 // ---------------------------------------------------------------------------
 // 1. Minimum release age stabilization
 // ---------------------------------------------------------------------------
-describe('minimumReleaseAge stabilization', () => {
-  it('applies 15-day minimum release age globally', async () => {
-    const result = await applyRules({
-      depName: 'some/package',
-      manager: 'gomod',
-      updateType: 'minor',
-    });
-
-    expect(result.minimumReleaseAge).toBe('15 days');
+describe('minimumReleaseAge stabilization (default.json)', () => {
+  // These are top-level Renovate config options in default.json,
+  // not packageRules (which require match* selectors).
+  it('applies 15-day minimum release age globally', () => {
+    expect(defaultConfig.minimumReleaseAge).toBe('15 days');
   });
 
-  it('sets prCreation to not-pending', async () => {
-    const result = await applyRules({
-      depName: 'some/package',
-      updateType: 'minor',
-    });
+  it('sets prCreation to not-pending', () => {
+    expect(defaultConfig.prCreation).toBe('not-pending');
+  });
 
-    expect(result.prCreation).toBe('not-pending');
+  it('sets internalChecksFilter to strict', () => {
+    expect(defaultConfig.internalChecksFilter).toBe('strict');
   });
 });
 

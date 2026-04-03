@@ -1,11 +1,6 @@
 {
   "packageRules": [
     {
-      "minimumReleaseAge": "15 days",
-      "prCreation": "not-pending",
-      "internalChecksFilter": "strict"
-    },
-    {
       "groupName": "github-actions",
       "matchManagers": [
         "github-actions"
