@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 // and settings without needing to run Renovate end-to-end.
 // Pinned to renovate 43.84.2 in package.json.
 import { applyPackageRules } from 'renovate/dist/util/package-rules/index.js';
+import { getOptions } from 'renovate/dist/config/options/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -214,14 +215,17 @@ describe('Go module minor/patch/pin/digest updates', () => {
     expect(result.postUpdateOptions).toContain('gomodUpdateImportPaths');
   });
 
-  it('applies goModTidy post-update option', async () => {
+  it('applies gomodTidy post-update option', async () => {
     const result = await applyRules({
       depName: 'github.com/example/module',
       manager: 'gomod',
       updateType: 'minor',
     });
 
-    expect(result.postUpdateOptions).toContain('goModTidy');
+    // Renovate matches this value with an exact string include (see
+    // modules/manager/gomod/artifacts.ts), so the casing has to be right or
+    // `go mod tidy` silently never runs.
+    expect(result.postUpdateOptions).toContain('gomodTidy');
   });
 
   it('does not auto-merge major go module updates via the go modules rule', async () => {
@@ -303,4 +307,32 @@ describe('Major dependency updates', () => {
     // (unless inherited from another matching rule)
     expect(result.automerge).toBeUndefined();
   });
+});
+
+// ---------------------------------------------------------------------------
+// 9. Guardrail: every option value we set must be one Renovate recognises
+// ---------------------------------------------------------------------------
+describe('postUpdateOptions values are valid', () => {
+  // renovate-config-validator does not check allowedValues for this option, and
+  // Renovate matches the values by exact string, so a typo is silently ignored
+  // rather than reported. This asserts against Renovate's own allowedValues.
+  const allowed: string[] =
+    getOptions().find((o: any) => o.name === 'postUpdateOptions')?.allowedValues ?? [];
+
+  it('exposes a non-empty allowedValues list to test against', () => {
+    expect(allowed.length).toBeGreaterThan(0);
+    expect(allowed).toContain('gomodTidy');
+  });
+
+  it('rejects the goModTidy casing that Renovate ignores', () => {
+    expect(allowed).not.toContain('goModTidy');
+  });
+
+  for (const rule of packageRules) {
+    for (const value of rule.postUpdateOptions ?? []) {
+      it(`"${value}" is a recognised postUpdateOptions value`, () => {
+        expect(allowed).toContain(value);
+      });
+    }
+  }
 });
