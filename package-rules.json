@@ -43,7 +43,7 @@
       "automerge": true,
       "postUpdateOptions": [
         "gomodUpdateImportPaths",
-        "goModTidy"
+        "gomodTidy"
       ]
     },
     {
