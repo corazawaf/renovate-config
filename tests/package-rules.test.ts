@@ -28,6 +28,7 @@ function applyRules(dep: {
   manager?: string;
   datasource?: string;
   updateType?: string;
+  sourceUrl?: string;
 }) {
   return applyPackageRules({
     packageName: dep.packageName ?? dep.depName,
@@ -36,6 +37,7 @@ function applyRules(dep: {
     manager: dep.manager,
     datasource: dep.datasource,
     updateType: dep.updateType,
+    sourceUrl: dep.sourceUrl,
     packageRules,
   });
 }
@@ -102,24 +104,24 @@ describe('GitHub Actions updates', () => {
 // ---------------------------------------------------------------------------
 describe('Golang version pinning', () => {
   describe('docker/golang-version datasource (go toolchain)', () => {
-    it('restricts go to ~1.25.0 via allowedVersions', async () => {
+    it('restricts go to ~1.26.0 via allowedVersions', async () => {
       const result = await applyRules({
         depName: 'go',
         datasource: 'golang-version',
         updateType: 'minor',
       });
 
-      expect(result.allowedVersions).toBe('~1.25.0');
+      expect(result.allowedVersions).toBe('~1.26.0');
     });
 
-    it('restricts golang docker image to ~1.25.0', async () => {
+    it('restricts golang docker image to ~1.26.0', async () => {
       const result = await applyRules({
         depName: 'golang',
         datasource: 'docker',
         updateType: 'minor',
       });
 
-      expect(result.allowedVersions).toBe('~1.25.0');
+      expect(result.allowedVersions).toBe('~1.26.0');
     });
 
     it('does not restrict unrelated docker images', async () => {
@@ -134,14 +136,14 @@ describe('Golang version pinning', () => {
   });
 
   describe('gomod manager (go directive in go.mod)', () => {
-    it('restricts go version in go.mod to ~1.25.0', async () => {
+    it('restricts go version in go.mod to ~1.26.0', async () => {
       const result = await applyRules({
         depName: 'go',
         manager: 'gomod',
         updateType: 'major',
       });
 
-      expect(result.allowedVersions).toBe('~1.25.0');
+      expect(result.allowedVersions).toBe('~1.26.0');
     });
 
     it('does not restrict go module dependencies', async () => {
@@ -156,14 +158,14 @@ describe('Golang version pinning', () => {
     });
   });
 
-  describe('~1.25.0 constraint behavior', () => {
-    // These tests document what ~1.25.0 means in semver:
-    // >=1.25.0 and <1.26.0 — only patch updates within 1.25.x
-    it('~1.25.0 allows 1.25.x patch versions', () => {
-      // The tilde range ~1.25.0 means >=1.25.0, <1.26.0
+  describe('~1.26.0 constraint behavior', () => {
+    // These tests document what ~1.26.0 means in semver:
+    // >=1.26.0 and <1.27.0 — only patch updates within 1.26.x
+    it('~1.26.0 allows 1.26.x patch versions', () => {
+      // The tilde range ~1.26.0 means >=1.26.0, <1.27.0
       // This is a documentation test to make the intent explicit
-      const allowed = '~1.25.0';
-      expect(allowed).toBe('~1.25.0');
+      const allowed = '~1.26.0';
+      expect(allowed).toBe('~1.26.0');
     });
 
     it('both golang rules use the same allowedVersions constraint', async () => {
@@ -306,6 +308,60 @@ describe('Major dependency updates', () => {
     // The major rule doesn't set automerge, so it should not be true
     // (unless inherited from another matching rule)
     expect(result.automerge).toBeUndefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 8. First-party packages are exempt from the stabilization delay
+// ---------------------------------------------------------------------------
+describe('corazawaf first-party minimumReleaseAge exemption', () => {
+  it('clears minimumReleaseAge for corazawaf-owned packages', async () => {
+    const result = await applyRules({
+      depName: 'github.com/corazawaf/coraza/v3',
+      manager: 'gomod',
+      sourceUrl: 'https://github.com/corazawaf/coraza',
+      updateType: 'minor',
+    });
+
+    expect(result.minimumReleaseAge).toBeNull();
+  });
+
+  it('clears minimumReleaseAge for corazawaf github actions', async () => {
+    const result = await applyRules({
+      depName: 'corazawaf/some-action',
+      manager: 'github-actions',
+      sourceUrl: 'https://github.com/corazawaf/some-action',
+      updateType: 'minor',
+    });
+
+    expect(result.minimumReleaseAge).toBeNull();
+  });
+
+  it('leaves third-party packages subject to the global delay', async () => {
+    const result = await applyRules({
+      depName: 'github.com/caddyserver/caddy/v2',
+      manager: 'gomod',
+      sourceUrl: 'https://github.com/caddyserver/caddy',
+      updateType: 'minor',
+    });
+
+    // Not overridden here, so the default.json global value applies.
+    expect(result.minimumReleaseAge).toBeUndefined();
+  });
+
+  it('does not match a lookalike org that merely starts with corazawaf', async () => {
+    const result = await applyRules({
+      depName: 'github.com/corazawaf-evil/thing',
+      manager: 'gomod',
+      sourceUrl: 'https://github.com/corazawaf-evil/thing',
+      updateType: 'minor',
+    });
+
+    expect(result.minimumReleaseAge).toBeUndefined();
+  });
+
+  it('keeps the global delay defined in default.json', () => {
+    expect(defaultConfig.minimumReleaseAge).toBe('15 days');
   });
 });
 

@@ -12,9 +12,10 @@ The main entry point that extends Renovate built-in presets (best-practices, sem
 
 Defines how dependency updates are handled:
 
-- **Stability gate**: All updates require a 15-day minimum release age before a PR is created (`prCreation: not-pending`).
+- **Stability gate**: External updates require a 15-day minimum release age before a PR is created (`prCreation: not-pending`).
+- **First-party exemption**: Packages sourced from `github.com/corazawaf/*` bypass the stability gate — they are our own releases, not external dependencies, so there is nothing to wait out.
 - **GitHub Actions**: Auto-merged as a group.
-- **Golang version pinning**: Both the Go toolchain (`golang-version`/`docker` datasources) and the `go` directive in `go.mod` are constrained to `~1.25.0` (i.e. only 1.25.x patch updates are allowed). This keeps Coraza one minor release behind the latest Go version for stability.
+- **Golang version pinning**: Both the Go toolchain (`golang-version`/`docker` datasources) and the `go` directive in `go.mod` are constrained to `~1.26.0` (i.e. only 1.26.x patch updates are allowed). This keeps Coraza one minor release behind the latest Go version for stability, so the code stays compatible with the two most recent Go releases. Bump this when a new Go minor is released.
 - **Go modules**: Minor, patch, pin, and digest updates are auto-merged with `gomodUpdateImportPaths` and `gomodTidy` post-update options.
 - **Non-major dependencies**: Grouped, auto-merged, and annotated with an [OpenSSF Scorecard](https://securityscorecards.dev) badge for GitHub-sourced packages.
 - **Dev dependencies**: Auto-merged.
