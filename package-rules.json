@@ -17,7 +17,7 @@
         "go",
         "golang"
       ],
-      "allowedVersions": "~1.25.0"
+      "allowedVersions": "~1.26.0"
     },
     {
       "groupName": "golang major release",
@@ -27,7 +27,7 @@
       "matchDepNames": [
         "go"
       ],
-      "allowedVersions": "~1.25.0"
+      "allowedVersions": "~1.26.0"
     },
     {
       "groupName": "go modules",
@@ -93,6 +93,13 @@
         "Change",
         "Pending"
       ]
+    },
+    {
+      "description": "corazawaf's own packages are first-party, not external dependencies, so the minimumReleaseAge stabilization delay does not apply.",
+      "matchSourceUrls": [
+        "https://github.com/corazawaf/**"
+      ],
+      "minimumReleaseAge": null
     }
   ]
 }
